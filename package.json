@@ -1,0 +1,160 @@
+{
+    "name": "zhihu-daily-vscode",
+    "displayName": "ZhiHu Daily",
+    "version": "0.1.0",
+    "description": "A VS Code extension for ZhiHu Daily.",
+    "author": {
+        "name": "Taipa Xu"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/TaipaXu/zhihu-daily-vscode"
+    },
+    "bugs": "https://github.com/TaipaXu/zhihu-daily-vscode/issues",
+    "publisher": "TaipaXu",
+    "engines": {
+        "vscode": "^1.32.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "zhihu",
+        "news",
+        "知乎",
+        "知户日报",
+        "新闻",
+        "资讯"
+    ],
+    "license": "GPL-3.0",
+    "icon": "static/images/icon.png",
+    "activationEvents": [
+        "onCommand:zhihuDaily.previous",
+        "onCommand:zhihuDaily.next",
+        "onCommand:zhihuDaily.refresh",
+        "onCommand:zhihuDaily.longComments",
+        "onCommand:zhihuDaily.shortComments"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "commands": [
+            {
+                "command": "zhihuDaily.previous",
+                "title": "Previous",
+                "icon": {
+                    "light": "static/images/point.svg",
+                    "dark": "static/images/point.svg"
+                }
+            },
+            {
+                "command": "zhihuDaily.next",
+                "title": "Next",
+                "icon": {
+                    "light": "static/images/point.svg",
+                    "dark": "static/images/point.svg"
+                }
+            },
+            {
+                "command": "zhihuDaily.refresh",
+                "title": "Refresh",
+                "icon": {
+                    "light": "static/images/point.svg",
+                    "dark": "static/images/point.svg"
+                }
+            },
+            {
+                "command": "zhihuDaily.longComments",
+                "title": "longComments"
+            },
+            {
+                "command": "zhihuDaily.shortComments",
+                "title": "shortComments"
+            }
+        ],
+        "menus": {
+            "view/title": [
+                {
+                    "command": "zhihuDaily.previous",
+                    "when": "view == zhihuDailyContent",
+                    "group": "navigation@0"
+                },
+                {
+                    "command": "zhihuDaily.next",
+                    "when": "view == zhihuDailyContent",
+                    "group": "navigation@1"
+                },
+                {
+                    "command": "zhihuDaily.refresh",
+                    "when": "view == zhihuDailyContent",
+                    "group": "navigation@2"
+                }
+            ],
+            "view/item/context": [
+                {
+                    "command": "zhihuDaily.longComments",
+                    "when": "view == zhihuDailyContent"
+                },
+                {
+                    "command": "zhihuDaily.shortComments",
+                    "when": "view == zhihuDailyContent"
+                }
+            ],
+            "commandPalette": [
+                {
+                    "command": "zhihuDaily.previous",
+                    "when": "never"
+                },
+                {
+                    "command": "zhihuDaily.next",
+                    "when": "never"
+                },
+                {
+                    "command": "zhihuDaily.refresh",
+                    "when": "never"
+                },
+                {
+                    "command": "zhihuDaily.longComments",
+                    "when": "never"
+                },
+                {
+                    "command": "zhihuDaily.shortComments",
+                    "when": "never"
+                }
+            ]
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "zhihuDaily",
+                    "title": "ZhiHu Daily",
+                    "icon": "static/images/icon.svg"
+                }
+            ]
+        },
+        "views": {
+            "zhihuDaily": [
+                {
+                    "id": "zhihuDailyContent",
+                    "name": "日报"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "typescript": "^3.3.1",
+        "vscode": "^1.1.28",
+        "tslint": "^5.12.1",
+        "@types/node": "^10.12.21",
+        "@types/mocha": "^2.2.42"
+    },
+    "dependencies": {
+        "axios": "^0.18.0",
+        "dayjs": "^1.8.12"
+    }
+}
