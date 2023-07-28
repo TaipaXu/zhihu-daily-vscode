@@ -18,7 +18,7 @@
 
 import * as vscode from 'vscode';
 import { AxiosPromise } from 'axios';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import request from '../request';
 
 export function getNews(page: number): AxiosPromise<any> {

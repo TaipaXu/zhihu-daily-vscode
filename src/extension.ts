@@ -17,7 +17,7 @@
  */
 
 import * as vscode from 'vscode';
-import  { NewsTreeDataProvider } from './tree/newsTree';
+import { NewsTreeDataProvider } from './tree/newsTree';
 import { generateHtml } from './webview/generator';
 
 export function activate(context: vscode.ExtensionContext) {
@@ -58,16 +58,25 @@ export function activate(context: vscode.ExtensionContext) {
             checkWebviewPanel();
             let html: string = await generateHtml(context, 'news', item);
             webviewPanel.webview.html = html;
+            webviewPanel.webview.postMessage({
+                "type": "init",
+            });
         }),
         vscode.commands.registerCommand('zhihuDaily.longComments', async (item: any) => {
             checkWebviewPanel();
             let html: string = await generateHtml(context, 'longComments', item);
             webviewPanel.webview.html = html;
+            webviewPanel.webview.postMessage({
+                "type": "init",
+            });
         }),
         vscode.commands.registerCommand('zhihuDaily.shortComments', async (item: any) => {
             checkWebviewPanel();
             let html: string = await generateHtml(context, 'shortComments', item);
             webviewPanel.webview.html = html;
+            webviewPanel.webview.postMessage({
+                "type": "init",
+            });
         }),
     );
 }
