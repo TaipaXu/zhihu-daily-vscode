@@ -16,9 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const path = require('path');
-const fs = require('fs');
-import * as dayjs from 'dayjs';
+import path from "path";
+import fs from 'fs';
+import dayjs from 'dayjs';
 import * as vscode from 'vscode';
 import * as newsApi from '../api/news';
 import * as commentApi from '../api/comment';

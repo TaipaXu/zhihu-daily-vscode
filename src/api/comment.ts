@@ -17,7 +17,7 @@
  */
 
 import { AxiosPromise } from 'axios';
-import * as dayjs from 'dayjs';
+import dayjs from 'dayjs';
 import request from '../request';
 
 export function getLongComments(id: number) {
