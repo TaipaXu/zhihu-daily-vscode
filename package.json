@@ -41,26 +41,17 @@
             {
                 "command": "zhihuDaily.previous",
                 "title": "Previous",
-                "icon": {
-                    "light": "static/images/point.svg",
-                    "dark": "static/images/point.svg"
-                }
+                "icon": "$(arrow-up)"
             },
             {
                 "command": "zhihuDaily.next",
                 "title": "Next",
-                "icon": {
-                    "light": "static/images/point.svg",
-                    "dark": "static/images/point.svg"
-                }
+                "icon": "$(arrow-down)"
             },
             {
                 "command": "zhihuDaily.refresh",
                 "title": "Refresh",
-                "icon": {
-                    "light": "static/images/point.svg",
-                    "dark": "static/images/point.svg"
-                }
+                "icon": "$(refresh)"
             },
             {
                 "command": "zhihuDaily.longComments",
