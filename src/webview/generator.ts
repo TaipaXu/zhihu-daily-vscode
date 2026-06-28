@@ -82,6 +82,10 @@ const getErrorMessage = (error: unknown): string => {
     return error instanceof Error ? error.message : '网络错误';
 };
 
+const isRequestCanceled = (signal?: AbortSignal): boolean => {
+    return signal?.aborted ?? false;
+};
+
 const renderMessage = (message: string): string => {
     return `<p>${escapeHtml(message)}</p>`;
 };
@@ -108,23 +112,28 @@ export const generateHtml = async (
     context: vscode.ExtensionContext,
     type: WebviewType,
     data: unknown,
+    signal?: AbortSignal,
 ): Promise<string> => {
     const html = getWebviewHtml(context);
 
     try {
         if (type === 'news') {
-            const response = await newsApi.getNewsDetail(getStoryId(data));
+            const response = await newsApi.getNewsDetail(getStoryId(data), signal);
             return html.replace('${content}', response.data.body);
         }
 
         const storyId = getStoryId(data);
         const response =
             type === 'longComments'
-                ? await commentApi.getLongComments(storyId)
-                : await commentApi.getShortComments(storyId);
+                ? await commentApi.getLongComments(storyId, signal)
+                : await commentApi.getShortComments(storyId, signal);
         const content = renderComments(response.data.comments, getCommentTemplate(context));
         return html.replace('${content}', content);
     } catch (error) {
+        if (isRequestCanceled(signal)) {
+            throw error;
+        }
+
         vscode.window.showWarningMessage(getErrorMessage(error));
         return html.replace('${content}', renderMessage('加载失败'));
     }

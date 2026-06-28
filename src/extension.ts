@@ -34,6 +34,22 @@ export const activate = (context: vscode.ExtensionContext): void => {
     );
 
     let webviewPanel: vscode.WebviewPanel | undefined;
+    let webviewRequestVersion = 0;
+    let webviewRequest:
+        | {
+              controller: AbortController;
+              version: number;
+          }
+        | undefined;
+
+    const abortWebviewRequest = (): void => {
+        if (!webviewRequest) {
+            return;
+        }
+
+        webviewRequest.controller.abort();
+        webviewRequest = undefined;
+    };
 
     const getWebviewPanel = (): vscode.WebviewPanel => {
         if (!webviewPanel) {
@@ -46,6 +62,7 @@ export const activate = (context: vscode.ExtensionContext): void => {
                 },
             );
             webviewPanel.onDidDispose(() => {
+                abortWebviewRequest();
                 webviewPanel = undefined;
             });
         }
@@ -57,8 +74,38 @@ export const activate = (context: vscode.ExtensionContext): void => {
         type: 'news' | 'longComments' | 'shortComments',
         item: unknown,
     ): Promise<void> => {
+        abortWebviewRequest();
+
         const panel = getWebviewPanel();
-        panel.webview.html = await generateHtml(context, type, item);
+        const controller = new AbortController();
+        const version = ++webviewRequestVersion;
+        webviewRequest = {
+            controller,
+            version,
+        };
+
+        try {
+            const html = await generateHtml(context, type, item, controller.signal);
+            if (
+                controller.signal.aborted ||
+                webviewRequest?.version !== version ||
+                webviewPanel !== panel
+            ) {
+                return;
+            }
+
+            panel.webview.html = html;
+        } catch (error) {
+            if (!controller.signal.aborted) {
+                throw error;
+            }
+            return;
+        } finally {
+            if (webviewRequest?.version === version) {
+                webviewRequest = undefined;
+            }
+        }
+
         panel.reveal(panel.viewColumn ?? vscode.ViewColumn.One);
         postInitMessage(panel);
     };
