@@ -21,9 +21,14 @@ import * as newsApi from '../api/news';
 import { formatDate, getDateBefore } from '../date';
 import { createStoryNode } from './storyNode';
 
-export class NewsTreeDataProvider extends AbstractTreeDataProvider {
-    private getCurrentDateLabel(): string {
-        return formatDate(getDateBefore(this.currentPage - 1));
+export class TopStoriesTreeDataProvider extends AbstractTreeDataProvider {
+    public refresh(): void {
+        this.clearCache();
+        this.fireChange();
+    }
+
+    protected getCacheKey(): string {
+        return 'top-stories';
     }
 
     protected getLoadingMessage(): string {
@@ -34,13 +39,32 @@ export class NewsTreeDataProvider extends AbstractTreeDataProvider {
         return this.getCurrentDateLabel();
     }
 
+    private getCurrentDateLabel(): string {
+        return formatDate(getDateBefore(0));
+    }
+
     protected async getItems(signal: AbortSignal): Promise<Node[]> {
-        const response = await newsApi.getNews(this.currentPage, signal);
-        const stories = response.data.stories;
-        if (!Array.isArray(stories)) {
+        const response = await newsApi.getNews(1, signal);
+        const topStories = response.data.top_stories;
+        if (!Array.isArray(topStories)) {
             throw new Error('数据格式异常');
         }
 
-        return stories.map((story) => createStoryNode(story));
+        const stories = Array.isArray(response.data.stories) ? response.data.stories : [];
+        const storiesById = new Map(stories.map((story) => [story.id, story]));
+
+        return topStories.map((story) => {
+            const dailyStory = storiesById.get(story.id);
+            const tooltipStory = dailyStory
+                ? {
+                      ...story,
+                      hint: dailyStory.hint ?? story.hint,
+                      image: dailyStory.images?.[0] ?? dailyStory.image ?? story.image,
+                      images: dailyStory.images ?? story.images,
+                  }
+                : story;
+
+            return createStoryNode(story, tooltipStory);
+        });
     }
 }

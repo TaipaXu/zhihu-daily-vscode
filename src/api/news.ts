@@ -23,11 +23,17 @@ import { formatApiDate, formatDate, getDateBefore } from '../date';
 export interface ZhihuNewsStory {
     id: number;
     title: string;
+    hint?: string;
+    image?: string;
+    images?: string[];
+    url?: string;
     [key: string]: unknown;
 }
 
 export interface ZhihuNewsListResponse {
+    date?: string;
     stories: ZhihuNewsStory[];
+    top_stories?: ZhihuNewsStory[];
     [key: string]: unknown;
 }
 

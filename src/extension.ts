@@ -18,6 +18,7 @@
 
 import * as vscode from 'vscode';
 import { NewsTreeDataProvider } from './tree/newsTree';
+import { TopStoriesTreeDataProvider } from './tree/topStoriesTree';
 import { generateHtml } from './webview/generator';
 
 const postInitMessage = (panel: vscode.WebviewPanel): void => {
@@ -27,7 +28,12 @@ const postInitMessage = (panel: vscode.WebviewPanel): void => {
 };
 
 export const activate = (context: vscode.ExtensionContext): void => {
+    const topStoriesDataProvider: TopStoriesTreeDataProvider = new TopStoriesTreeDataProvider();
     const newsDataProvider: NewsTreeDataProvider = new NewsTreeDataProvider();
+    const topStoriesTreeDataProvider = vscode.window.registerTreeDataProvider(
+        'zhihuDailyTopStories',
+        topStoriesDataProvider,
+    );
     const treeDataProvider = vscode.window.registerTreeDataProvider(
         'zhihuDailyContent',
         newsDataProvider,
@@ -111,7 +117,11 @@ export const activate = (context: vscode.ExtensionContext): void => {
     };
 
     context.subscriptions.push(
+        topStoriesTreeDataProvider,
         treeDataProvider,
+        vscode.commands.registerCommand('zhihuDaily.topStoriesRefresh', () => {
+            topStoriesDataProvider.refresh();
+        }),
         vscode.commands.registerCommand('zhihuDaily.previous', () => {
             newsDataProvider.prevPage();
         }),

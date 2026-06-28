@@ -45,6 +45,11 @@
     "contributes": {
         "commands": [
             {
+                "command": "zhihuDaily.topStoriesRefresh",
+                "title": "刷新",
+                "icon": "$(refresh)"
+            },
+            {
                 "command": "zhihuDaily.previous",
                 "title": "下一页",
                 "icon": "$(arrow-up)"
@@ -71,6 +76,11 @@
         "menus": {
             "view/title": [
                 {
+                    "command": "zhihuDaily.topStoriesRefresh",
+                    "when": "view == zhihuDailyTopStories",
+                    "group": "navigation@0"
+                },
+                {
                     "command": "zhihuDaily.previous",
                     "when": "view == zhihuDailyContent",
                     "group": "navigation@0"
@@ -89,14 +99,26 @@
             "view/item/context": [
                 {
                     "command": "zhihuDaily.longComments",
-                    "when": "view == zhihuDailyContent"
+                    "when": "view == zhihuDailyTopStories && viewItem == story"
                 },
                 {
                     "command": "zhihuDaily.shortComments",
-                    "when": "view == zhihuDailyContent"
+                    "when": "view == zhihuDailyTopStories && viewItem == story"
+                },
+                {
+                    "command": "zhihuDaily.longComments",
+                    "when": "view == zhihuDailyContent && viewItem == story"
+                },
+                {
+                    "command": "zhihuDaily.shortComments",
+                    "when": "view == zhihuDailyContent && viewItem == story"
                 }
             ],
             "commandPalette": [
+                {
+                    "command": "zhihuDaily.topStoriesRefresh",
+                    "when": "never"
+                },
                 {
                     "command": "zhihuDaily.previous",
                     "when": "never"
@@ -130,6 +152,10 @@
         },
         "views": {
             "zhihuDaily": [
+                {
+                    "id": "zhihuDailyTopStories",
+                    "name": "今日精选"
+                },
                 {
                     "id": "zhihuDailyContent",
                     "name": "日报"
