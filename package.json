@@ -51,12 +51,12 @@
             },
             {
                 "command": "zhihuDaily.previous",
-                "title": "下一页",
+                "title": "后一天",
                 "icon": "$(arrow-up)"
             },
             {
                 "command": "zhihuDaily.next",
-                "title": "上一页",
+                "title": "前一天",
                 "icon": "$(arrow-down)"
             },
             {
