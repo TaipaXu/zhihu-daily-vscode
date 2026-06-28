@@ -21,10 +21,32 @@ import { NewsTreeDataProvider } from './tree/newsTree';
 import { TopStoriesTreeDataProvider } from './tree/topStoriesTree';
 import { generateHtml } from './webview/generator';
 
+type WebviewType = 'news' | 'longComments' | 'shortComments';
+type WebviewKind = 'content' | 'comments';
+
+interface WebviewState {
+    panel?: vscode.WebviewPanel;
+    requestVersion: number;
+    request?:
+        | {
+              controller: AbortController;
+              version: number;
+          }
+        | undefined;
+}
+
 const postInitMessage = (panel: vscode.WebviewPanel): void => {
     panel.webview.postMessage({
         type: 'init',
     });
+};
+
+const getWebviewKind = (type: WebviewType): WebviewKind => {
+    return type === 'news' ? 'content' : 'comments';
+};
+
+const getWebviewTitle = (kind: WebviewKind): string => {
+    return kind === 'content' ? '知乎日报内容' : '知乎日报评论';
 };
 
 export const activate = (context: vscode.ExtensionContext): void => {
@@ -39,53 +61,57 @@ export const activate = (context: vscode.ExtensionContext): void => {
         newsDataProvider,
     );
 
-    let webviewPanel: vscode.WebviewPanel | undefined;
-    let webviewRequestVersion = 0;
-    let webviewRequest:
-        | {
-              controller: AbortController;
-              version: number;
-          }
-        | undefined;
+    const webviews: Record<WebviewKind, WebviewState> = {
+        content: {
+            requestVersion: 0,
+        },
+        comments: {
+            requestVersion: 0,
+        },
+    };
 
-    const abortWebviewRequest = (): void => {
-        if (!webviewRequest) {
+    const abortWebviewRequest = (state: WebviewState): void => {
+        if (!state.request) {
             return;
         }
 
-        webviewRequest.controller.abort();
-        webviewRequest = undefined;
+        state.request.controller.abort();
+        state.request = undefined;
     };
 
-    const getWebviewPanel = (): vscode.WebviewPanel => {
-        if (!webviewPanel) {
-            webviewPanel = vscode.window.createWebviewPanel(
-                'ZhiHu Daily',
-                'ZhiHu Daily',
+    const getWebviewPanel = (kind: WebviewKind): vscode.WebviewPanel => {
+        const state = webviews[kind];
+        if (!state.panel) {
+            const panel = vscode.window.createWebviewPanel(
+                `zhihuDaily.${kind}`,
+                getWebviewTitle(kind),
                 vscode.ViewColumn.One,
                 {
                     enableScripts: true,
                 },
             );
-            webviewPanel.onDidDispose(() => {
-                abortWebviewRequest();
-                webviewPanel = undefined;
+            state.panel = panel;
+            panel.onDidDispose(() => {
+                abortWebviewRequest(state);
+                if (state.panel === panel) {
+                    state.panel = undefined;
+                }
             });
         }
 
-        return webviewPanel;
+        return state.panel;
     };
 
-    const showWebview = async (
-        type: 'news' | 'longComments' | 'shortComments',
-        item: unknown,
-    ): Promise<void> => {
-        abortWebviewRequest();
+    const showWebview = async (type: WebviewType, item: unknown): Promise<void> => {
+        const kind = getWebviewKind(type);
+        const state = webviews[kind];
+        abortWebviewRequest(state);
 
-        const panel = getWebviewPanel();
+        const panel = getWebviewPanel(kind);
+        panel.reveal(panel.viewColumn ?? vscode.ViewColumn.One);
         const controller = new AbortController();
-        const version = ++webviewRequestVersion;
-        webviewRequest = {
+        const version = ++state.requestVersion;
+        state.request = {
             controller,
             version,
         };
@@ -94,8 +120,8 @@ export const activate = (context: vscode.ExtensionContext): void => {
             const html = await generateHtml(context, type, item, controller.signal);
             if (
                 controller.signal.aborted ||
-                webviewRequest?.version !== version ||
-                webviewPanel !== panel
+                state.request?.version !== version ||
+                state.panel !== panel
             ) {
                 return;
             }
@@ -107,12 +133,11 @@ export const activate = (context: vscode.ExtensionContext): void => {
             }
             return;
         } finally {
-            if (webviewRequest?.version === version) {
-                webviewRequest = undefined;
+            if (state.request?.version === version) {
+                state.request = undefined;
             }
         }
 
-        panel.reveal(panel.viewColumn ?? vscode.ViewColumn.One);
         postInitMessage(panel);
     };
 
