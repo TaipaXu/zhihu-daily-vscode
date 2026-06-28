@@ -46,26 +46,26 @@
         "commands": [
             {
                 "command": "zhihuDaily.previous",
-                "title": "Previous",
+                "title": "下一页",
                 "icon": "$(arrow-up)"
             },
             {
                 "command": "zhihuDaily.next",
-                "title": "Next",
+                "title": "上一页",
                 "icon": "$(arrow-down)"
             },
             {
                 "command": "zhihuDaily.refresh",
-                "title": "Refresh",
+                "title": "刷新",
                 "icon": "$(refresh)"
             },
             {
                 "command": "zhihuDaily.longComments",
-                "title": "longComments"
+                "title": "长评论"
             },
             {
                 "command": "zhihuDaily.shortComments",
-                "title": "shortComments"
+                "title": "短评论"
             }
         ],
         "menus": {
@@ -123,7 +123,7 @@
             "activitybar": [
                 {
                     "id": "zhihuDaily",
-                    "title": "ZhiHu Daily",
+                    "title": "知乎日报",
                     "icon": "static/images/icon.svg"
                 }
             ]
