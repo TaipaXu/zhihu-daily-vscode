@@ -3,6 +3,19 @@
     "displayName": "ZhiHu Daily",
     "version": "0.2.0",
     "description": "A VS Code extension for ZhiHu Daily.",
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "news",
+        "zhihu",
+        "新闻",
+        "知乎",
+        "知户日报",
+        "资讯"
+    ],
+    "bugs": "https://github.com/TaipaXu/zhihu-daily-vscode/issues",
+    "license": "GPL-3.0",
     "author": {
         "name": "Taipa Xu"
     },
@@ -10,32 +23,25 @@
         "type": "git",
         "url": "https://github.com/TaipaXu/zhihu-daily-vscode"
     },
-    "bugs": "https://github.com/TaipaXu/zhihu-daily-vscode/issues",
     "publisher": "TaipaXu",
-    "engines": {
-        "vscode": "^1.80.0"
-    },
-    "categories": [
-        "Other"
-    ],
-    "keywords": [
-        "zhihu",
-        "news",
-        "知乎",
-        "知户日报",
-        "新闻",
-        "资讯"
-    ],
-    "license": "GPL-3.0",
-    "icon": "static/images/icon.png",
-    "activationEvents": [
-        "onCommand:zhihuDaily.previous",
-        "onCommand:zhihuDaily.next",
-        "onCommand:zhihuDaily.refresh",
-        "onCommand:zhihuDaily.longComments",
-        "onCommand:zhihuDaily.shortComments"
-    ],
     "main": "./out/extension.js",
+    "scripts": {
+        "dev": "vp build --watch --mode development",
+        "build": "vp build",
+        "type-check": "tsc --noEmit",
+        "lint": "vp lint . --fix",
+        "format": "vp fmt .",
+        "check": "vp check .",
+        "package": "vp run build && vp exec vsce package --no-dependencies",
+        "prepare": "vp config"
+    },
+    "devDependencies": {
+        "@types/node": "^24.13.2",
+        "@types/vscode": "^1.125.0",
+        "@vscode/vsce": "^3.9.2",
+        "typescript": "^6.0.3",
+        "vite-plus": "^0.2.1"
+    },
     "contributes": {
         "commands": [
             {
@@ -131,20 +137,10 @@
             ]
         }
     },
-    "scripts": {
-        "build-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
-        "dev": "npm run build-base -- --sourcemap --watch",
-        "build": "npm run build-base -- --minify",
-        "package": "vsce package --no-dependencies"
+    "icon": "static/images/icon.png",
+    "engines": {
+        "node": "24.17.0",
+        "vscode": "^1.125.0"
     },
-    "devDependencies": {
-        "@types/node": "^20.4.5",
-        "@types/vscode": "^1.80.0",
-        "esbuild": "^0.18.17",
-        "vsce": "^2.15.0"
-    },
-    "dependencies": {
-        "axios": "^1.4.0",
-        "dayjs": "^1.11.9"
-    }
+    "packageManager": "pnpm@11.5.2"
 }

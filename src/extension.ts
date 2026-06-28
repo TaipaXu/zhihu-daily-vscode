@@ -20,65 +20,70 @@ import * as vscode from 'vscode';
 import { NewsTreeDataProvider } from './tree/newsTree';
 import { generateHtml } from './webview/generator';
 
-export function activate(context: vscode.ExtensionContext) {
+const postInitMessage = (panel: vscode.WebviewPanel): void => {
+    panel.webview.postMessage({
+        type: 'init',
+    });
+};
+
+export const activate = (context: vscode.ExtensionContext): void => {
     const newsDataProvider: NewsTreeDataProvider = new NewsTreeDataProvider();
-    vscode.window.registerTreeDataProvider('zhihuDailyContent', newsDataProvider);
+    const treeDataProvider = vscode.window.registerTreeDataProvider(
+        'zhihuDailyContent',
+        newsDataProvider,
+    );
 
-    let webviewOpened: Boolean = false;
-    let webviewPanel: vscode.WebviewPanel;
+    let webviewPanel: vscode.WebviewPanel | undefined;
 
-    function checkWebviewPanel(): void {
-        if (!webviewOpened) {
+    const getWebviewPanel = (): vscode.WebviewPanel => {
+        if (!webviewPanel) {
             webviewPanel = vscode.window.createWebviewPanel(
                 'ZhiHu Daily',
                 'ZhiHu Daily',
                 vscode.ViewColumn.One,
                 {
-                    enableScripts: true
-                }
+                    enableScripts: true,
+                },
             );
-            webviewOpened = true;
             webviewPanel.onDidDispose(() => {
-                webviewOpened = false;
+                webviewPanel = undefined;
             });
         }
-    }
+
+        return webviewPanel;
+    };
+
+    const showWebview = async (
+        type: 'news' | 'longComments' | 'shortComments',
+        item: unknown,
+    ): Promise<void> => {
+        const panel = getWebviewPanel();
+        panel.webview.html = await generateHtml(context, type, item);
+        panel.reveal(panel.viewColumn ?? vscode.ViewColumn.One);
+        postInitMessage(panel);
+    };
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('zhihuDaily.previous', (item: any) => {
+        treeDataProvider,
+        vscode.commands.registerCommand('zhihuDaily.previous', () => {
             newsDataProvider.prevPage();
         }),
-        vscode.commands.registerCommand('zhihuDaily.next', (item: any) => {
+        vscode.commands.registerCommand('zhihuDaily.next', () => {
             newsDataProvider.nextPage();
         }),
-        vscode.commands.registerCommand('zhihuDaily.refresh', (item: any) => {
+        vscode.commands.registerCommand('zhihuDaily.refresh', () => {
             newsDataProvider.refresh();
         }),
-        vscode.commands.registerCommand('zhihuDaily.select', async (item: any) => {
-            checkWebviewPanel();
-            let html: string = await generateHtml(context, 'news', item);
-            webviewPanel.webview.html = html;
-            webviewPanel.webview.postMessage({
-                "type": "init",
-            });
+        vscode.commands.registerCommand('zhihuDaily.select', async (item: unknown) => {
+            await showWebview('news', item);
         }),
-        vscode.commands.registerCommand('zhihuDaily.longComments', async (item: any) => {
-            checkWebviewPanel();
-            let html: string = await generateHtml(context, 'longComments', item);
-            webviewPanel.webview.html = html;
-            webviewPanel.webview.postMessage({
-                "type": "init",
-            });
+        vscode.commands.registerCommand('zhihuDaily.longComments', async (item: unknown) => {
+            await showWebview('longComments', item);
         }),
-        vscode.commands.registerCommand('zhihuDaily.shortComments', async (item: any) => {
-            checkWebviewPanel();
-            let html: string = await generateHtml(context, 'shortComments', item);
-            webviewPanel.webview.html = html;
-            webviewPanel.webview.postMessage({
-                "type": "init",
-            });
+        vscode.commands.registerCommand('zhihuDaily.shortComments', async (item: unknown) => {
+            await showWebview('shortComments', item);
         }),
     );
-}
+};
 
-export function deactivate() { }
+export const deactivate = (): void => {};

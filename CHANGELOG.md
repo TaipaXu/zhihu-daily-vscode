@@ -7,5 +7,7 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 ## [Unreleased]
 
 ## [0.2.0] - 2019-04-06
+
 ### Added
+
 - First release

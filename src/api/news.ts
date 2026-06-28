@@ -17,28 +17,51 @@
  */
 
 import * as vscode from 'vscode';
-import { AxiosPromise } from 'axios';
-import dayjs from 'dayjs';
-import request from '../request';
+import request, { type RequestResponse } from '../request';
+import { formatApiDate, formatDate, getDateBefore } from '../date';
 
-export function getNews(page: number): AxiosPromise<any> {
-    let url;
+export interface ZhihuNewsStory {
+    id: number;
+    title: string;
+    [key: string]: unknown;
+}
+
+export interface ZhihuNewsListResponse {
+    stories: ZhihuNewsStory[];
+    [key: string]: unknown;
+}
+
+export interface ZhihuNewsDetailResponse {
+    body: string;
+    [key: string]: unknown;
+}
+
+export const getNews = async (
+    page: number,
+    signal?: AbortSignal,
+): Promise<RequestResponse<ZhihuNewsListResponse>> => {
+    let url: string;
     if (page === 1) {
         url = 'news/latest';
     } else {
-        url = 'news/before/' + dayjs().subtract(page - 2, 'day').format('YYYYMMDD');
+        url = `news/before/${formatApiDate(getDateBefore(page - 2))}`;
     }
-    vscode.window.setStatusBarMessage(dayjs().subtract(page - 1, 'day').format('YYYY-MM-DD'));
+    vscode.window.setStatusBarMessage(formatDate(getDateBefore(page - 1)));
 
-    return request({
-        url: url,
-        method: 'GET'
+    return await request<ZhihuNewsListResponse>({
+        url,
+        method: 'GET',
+        signal,
     });
-}
+};
 
-export function getNewsDetail(id: number) {
-    return request({
+export const getNewsDetail = async (
+    id: number,
+    signal?: AbortSignal,
+): Promise<RequestResponse<ZhihuNewsDetailResponse>> => {
+    return await request<ZhihuNewsDetailResponse>({
         url: `news/${id}`,
-        method: 'GET'
+        method: 'GET',
+        signal,
     });
-}
+};

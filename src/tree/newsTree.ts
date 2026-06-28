@@ -21,24 +21,23 @@ import { AbstractTreeDataProvider, Node } from './abstractTree';
 import * as newsApi from '../api/news';
 
 export class NewsTreeDataProvider extends AbstractTreeDataProvider {
-    protected async getItems(): Promise<Array<Node>> {
-        let items: Array<Node> = [];
-        try {
-            let response: any = await newsApi.getNews(this.currentPage);
-            response.data.stories.forEach((element: any) => {
-                items.push(new Node(
-                    element.title,
-                    vscode.TreeItemCollapsibleState.None,
-                    {
-                        command: 'zhihuDaily.select',
-                        title: '',
-                        arguments: [element]
-                    }
-                ));
-            });
-        } catch (error) {
-
+    protected async getItems(signal: AbortSignal): Promise<Node[]> {
+        const response = await newsApi.getNews(this.currentPage, signal);
+        const items: Node[] = [];
+        const stories = response.data.stories;
+        if (!Array.isArray(stories)) {
+            throw new Error('数据格式异常');
         }
+
+        stories.forEach((element) => {
+            items.push(
+                new Node(element.title, vscode.TreeItemCollapsibleState.None, {
+                    command: 'zhihuDaily.select',
+                    title: '',
+                    arguments: [element],
+                }),
+            );
+        });
         return items;
     }
 }

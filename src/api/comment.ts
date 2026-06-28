@@ -16,19 +16,38 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { AxiosPromise } from 'axios';
-import dayjs from 'dayjs';
-import request from '../request';
+import request, { type RequestResponse } from '../request';
 
-export function getLongComments(id: number) {
-    return request({
-        url: `story/${id}/long-comments`
-    });
+export interface ZhihuComment {
+    author: string;
+    content: string;
+    time: number;
+    [key: string]: unknown;
 }
 
-export function getShortComments(id: number) {
-    return request({
+export interface ZhihuCommentResponse {
+    comments: ZhihuComment[];
+    [key: string]: unknown;
+}
+
+export const getLongComments = async (
+    id: number,
+    signal?: AbortSignal,
+): Promise<RequestResponse<ZhihuCommentResponse>> => {
+    return await request<ZhihuCommentResponse>({
+        url: `story/${id}/long-comments`,
+        method: 'GET',
+        signal,
+    });
+};
+
+export const getShortComments = async (
+    id: number,
+    signal?: AbortSignal,
+): Promise<RequestResponse<ZhihuCommentResponse>> => {
+    return await request<ZhihuCommentResponse>({
         url: `story/${id}/short-comments`,
-        method: 'GET'
+        method: 'GET',
+        signal,
     });
-}
+};
