@@ -21,8 +21,281 @@
         <title>ZhiHu Daily</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <style>
+            :root {
+                color-scheme: light dark;
+                --page-max-width: 760px;
+                --content-gap: 18px;
+                --card-radius: 8px;
+                --surface-color: var(--vscode-editorWidget-background, rgba(127, 127, 127, 0.08));
+                --surface-border: var(--vscode-panel-border, rgba(127, 127, 127, 0.22));
+                --muted-color: var(--vscode-descriptionForeground, rgba(127, 127, 127, 0.86));
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            html {
+                background: var(--vscode-editor-background, #ffffff);
+            }
+
+            body {
+                margin: 0;
+                color: var(--vscode-editor-foreground, #1f2328);
+                background: var(--vscode-editor-background, #ffffff);
+                font-family: var(
+                    --vscode-font-family,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    'Segoe UI',
+                    sans-serif
+                );
+                font-size: var(--vscode-font-size, 14px);
+                line-height: 1.72;
+            }
+
+            main {
+                width: min(100%, var(--page-max-width));
+                margin: 0 auto;
+                padding: 28px 24px 42px;
+            }
+
+            a {
+                color: var(--vscode-textLink-foreground, #0969da);
+                text-decoration: none;
+            }
+
+            a:hover {
+                color: var(
+                    --vscode-textLink-activeForeground,
+                    var(--vscode-textLink-foreground, #0969da)
+                );
+                text-decoration: underline;
+            }
+
+            p {
+                margin: 0 0 var(--content-gap);
+            }
+
+            main > p:only-child {
+                margin: 40px 0;
+                color: var(--muted-color);
+                text-align: center;
+            }
+
+            h1,
+            h2,
+            h3 {
+                margin: 28px 0 14px;
+                line-height: 1.35;
+                font-weight: 650;
+            }
+
+            h1 {
+                font-size: 1.86rem;
+            }
+
+            h2 {
+                font-size: 1.45rem;
+            }
+
+            h3 {
+                font-size: 1.18rem;
+            }
+
+            blockquote {
+                margin: 22px 0;
+                padding: 2px 0 2px 16px;
+                color: var(--muted-color);
+                border-left: 3px solid var(--surface-border);
+            }
+
+            img {
+                display: block;
+                max-width: 100%;
+                height: auto;
+                border-radius: 6px;
+            }
+
             .pic__img {
-                margin-bottom: 12px;
+                margin-bottom: 10px;
+            }
+
+            .headline {
+                margin: -28px -24px 28px;
+            }
+
+            .headline,
+            .headline-background {
+                position: relative;
+                overflow: hidden;
+                border-radius: 0 0 var(--card-radius) var(--card-radius);
+            }
+
+            .headline img,
+            .headline-background img {
+                width: 100%;
+                border-radius: 0;
+            }
+
+            .headline-title {
+                margin: 18px 24px 0;
+                font-size: 1.9rem;
+                line-height: 1.28;
+            }
+
+            .headline-background .heading {
+                position: absolute;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                padding: 56px 24px 22px;
+                color: #fff;
+                background: linear-gradient(to top, rgba(0, 0, 0, 0.78), rgba(0, 0, 0, 0));
+            }
+
+            .headline-background .heading-content,
+            .headline-background .heading-title {
+                margin: 0;
+                color: #fff;
+                text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+            }
+
+            .headline-background .heading-content {
+                font-size: 1.9rem;
+                line-height: 1.28;
+                font-weight: 650;
+            }
+
+            .headline-background .heading-title {
+                margin-top: 8px;
+                font-size: 0.9rem;
+                opacity: 0.82;
+            }
+
+            .content-wrap,
+            .content-inner,
+            .question,
+            .answer {
+                max-width: 100%;
+            }
+
+            .question-title {
+                margin-top: 26px;
+                font-size: 1.28rem;
+                line-height: 1.38;
+                font-weight: 650;
+            }
+
+            .meta {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                margin: 14px 0 20px;
+                color: var(--muted-color);
+                font-size: 0.92rem;
+            }
+
+            .meta .avatar {
+                width: 30px;
+                height: 30px;
+                flex: 0 0 auto;
+                border-radius: 50%;
+            }
+
+            .meta .author {
+                color: var(--vscode-editor-foreground, #1f2328);
+                font-weight: 600;
+            }
+
+            .bio {
+                color: var(--muted-color);
+            }
+
+            .content-image,
+            .origin_image {
+                margin: 22px auto;
+            }
+
+            .pic__caption,
+            .caption {
+                margin: -2px 0 18px;
+                color: var(--muted-color);
+                font-size: 0.88rem;
+                line-height: 1.55;
+                text-align: center;
+            }
+
+            .view-more,
+            .view-more a {
+                color: var(--muted-color);
+                font-size: 0.92rem;
+            }
+
+            .comment-card {
+                padding: 18px 20px;
+                margin-bottom: 14px;
+                background: var(--surface-color);
+                border: 1px solid var(--surface-border);
+                border-radius: var(--card-radius);
+            }
+
+            .comment-card__header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 10px;
+            }
+
+            .comment-card__author {
+                overflow-wrap: anywhere;
+                font-weight: 650;
+                line-height: 1.4;
+            }
+
+            .comment-card__body {
+                overflow-wrap: anywhere;
+            }
+
+            .comment-card__body p:last-child,
+            .comment-card__footer p {
+                margin-bottom: 0;
+            }
+
+            .comment-card__footer {
+                margin-top: 12px;
+                color: var(--muted-color);
+                font-size: 0.86rem;
+                line-height: 1.5;
+            }
+
+            @media (max-width: 640px) {
+                main {
+                    padding: 20px 16px 32px;
+                }
+
+                .headline {
+                    margin: -20px -16px 24px;
+                }
+
+                .headline-title {
+                    margin-right: 16px;
+                    margin-left: 16px;
+                }
+
+                .headline-background .heading {
+                    padding: 52px 16px 18px;
+                }
+
+                .headline-title,
+                .headline-background .heading-content {
+                    font-size: 1.55rem;
+                }
+
+                .comment-card {
+                    padding: 16px;
+                }
             }
         </style>
     </head>
